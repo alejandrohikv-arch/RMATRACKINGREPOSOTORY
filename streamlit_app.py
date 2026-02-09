@@ -306,6 +306,22 @@ def fetch_logs(case_id: str = "", limit: int = 1000) -> pd.DataFrame:
     conn.close()
     return df
 
+def fetch_statuses() -> list[str]:
+    conn = get_conn()
+    rows = conn.execute(
+        """
+        SELECT DISTINCT estado
+        FROM cases
+        WHERE estado IS NOT NULL AND TRIM(estado) <> ''
+        ORDER BY estado
+        """
+    ).fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
+
+
+
 # -----------------------------
 # CSV import/merge
 # -----------------------------
@@ -536,7 +552,14 @@ if page == "Cases":
     with c1:
         q = st.text_input("Search", placeholder="CASE_ID / Ticket / SN / Client / RQ / Order / Tracking")
     with c2:
-        status_filter = st.text_input("Filter by exact status (optional)", placeholder="e.g. AWAITING_HQ")
+    statuses = fetch_statuses()  # ya la tienes definida arriba
+    status_choice = st.selectbox(
+        "Filter by status",
+        options=["(All)"] + statuses,
+        index=0,
+        key="status_choice",
+    )
+    status_filter = "" if status_choice == "(All)" else status_choice
     with c3:
         st.write("")
         st.write("")
