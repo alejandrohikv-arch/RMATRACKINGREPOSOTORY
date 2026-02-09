@@ -135,8 +135,10 @@ def init_db() -> None:
     conn = get_conn()
     cur = conn.cursor()
 
-    # cases table
-    cols_sql = ",\n".join([f"{c} TEXT" for c in CASE_COLS])
+    # cases table (avoid duplicating case_id)
+    non_pk_cols = [c for c in CASE_COLS if c != "case_id"]
+    cols_sql = ",\n".join([f"{c} TEXT" for c in non_pk_cols])
+
     cur.execute(
         f"""
         CREATE TABLE IF NOT EXISTS cases (
@@ -169,6 +171,7 @@ def init_db() -> None:
 
     conn.commit()
     conn.close()
+
 
 def log_action(
     conn: sqlite3.Connection,
