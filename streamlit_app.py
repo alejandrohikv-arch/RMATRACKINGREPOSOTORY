@@ -150,7 +150,6 @@ def init_db() -> None:
         """
     )
 
-    # audit log table
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS audit_log (
@@ -171,6 +170,7 @@ def init_db() -> None:
 
     conn.commit()
     conn.close()
+
 
 
 def log_action(
